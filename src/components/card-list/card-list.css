@@ -5,7 +5,7 @@
   gap: 35px;
   justify-content: center;
   min-width: 320px;
-  max-width: 1010px;
+  max-width: 80%;
 }
 
 @media (max-width: 900px) {

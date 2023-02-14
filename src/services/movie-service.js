@@ -13,7 +13,8 @@ export default class MovieService {
 
   getMovies = async (req, pageNum) => {
     const res = await this.getResource(`search/movie?${this._apiKey}&${encodeURI(`query=${req}&page=${pageNum}`)}`);
-    return res.results.map(this._transformMovies);
+    const totalPages = res.total_results;
+    return { movies: res.results.map(this._transformMovies), totalPages: totalPages };
   };
 
   getNewSession = async () => {
@@ -28,7 +29,8 @@ export default class MovieService {
 
   getRatedMovie = async (token, page) => {
     const res = await this.getResource(`guest_session/${token}/rated/movies?${this._apiKey}&page=${page}`);
-    return res.results.map(this._transformMovies);
+    const totalPages = res.total_results;
+    return { moviesRate: res.results.map(this._transformMovies), totalPages: totalPages };
   };
 
   setRated = async (id, value, token) => {

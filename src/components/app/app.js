@@ -14,10 +14,11 @@ export default class App extends Component {
   movieService = new MovieService();
 
   state = {
-    search: 'batman',
+    search: 'return',
     movies: [],
     moviesRate: [],
     pageNum: 1,
+    totalPages: 0,
     token: localStorage.getItem('token'),
     key: '1',
     genres: [],
@@ -56,6 +57,9 @@ export default class App extends Component {
     if (key === '2' && this.state.key !== prevState.key) {
       this.movieService.getRatedMovie(token, pageNum).then(this.onMovieRateLoaded).catch(this.onErorr);
     }
+    if (key === '1' && this.state.key !== prevState.key) {
+      this.movieService.getMovies(search, pageNum).then(this.onMovieLoaded).catch(this.onErorr);
+    }
   }
 
   onErorr = () => {
@@ -65,16 +69,18 @@ export default class App extends Component {
     });
   };
 
-  onMovieLoaded = (movies) => {
+  onMovieLoaded = ({ movies, totalPages }) => {
     this.setState({
       movies,
+      totalPages,
       loading: false,
     });
   };
 
-  onMovieRateLoaded = (moviesRate) => {
+  onMovieRateLoaded = ({ moviesRate, totalPages }) => {
     this.setState({
       moviesRate,
+      totalPages,
       loading: false,
     });
   };
@@ -100,7 +106,7 @@ export default class App extends Component {
   };
 
   render() {
-    const { movies, loading, pageNum, moviesRate, genres, error } = this.state;
+    const { movies, loading, pageNum, moviesRate, genres, error, totalPages } = this.state;
     const onSearchDeb = debounce(this.onSearch, 800);
     const movieList = movies.length ? <CardList movies={movies} /> : <Alert message="No movies found for this query" />;
 
@@ -108,14 +114,14 @@ export default class App extends Component {
       <React.Fragment>
         <Search onSearch={onSearchDeb} />
         {movieList}
-        <Pagination className="pagination" current={pageNum} total={500} onChange={this.onPageNumber} />
+        <Pagination className="pagination" current={pageNum} total={totalPages / 2} onChange={this.onPageNumber} />
       </React.Fragment>
     );
 
     const moviesRatePage = (
       <React.Fragment>
         <CardList movies={moviesRate} />
-        <Pagination className="pagination" current={pageNum} total={500} onChange={this.onPageNumber} />
+        <Pagination className="pagination" current={pageNum} total={totalPages / 2} onChange={this.onPageNumber} />
       </React.Fragment>
     );
 
