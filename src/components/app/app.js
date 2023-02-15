@@ -114,14 +114,26 @@ export default class App extends Component {
       <React.Fragment>
         <Search onSearch={onSearchDeb} />
         {movieList}
-        <Pagination className="pagination" current={pageNum} total={totalPages / 2} onChange={this.onPageNumber} />
+        <Pagination
+          className="pagination"
+          current={pageNum}
+          total={totalPages}
+          defaultPageSize={20}
+          onChange={this.onPageNumber}
+        />
       </React.Fragment>
     );
 
     const moviesRatePage = (
       <React.Fragment>
         <CardList movies={moviesRate} />
-        <Pagination className="pagination" current={pageNum} total={totalPages / 2} onChange={this.onPageNumber} />
+        <Pagination
+          className="pagination"
+          current={pageNum}
+          total={totalPages}
+          defaultPageSize={20}
+          onChange={this.onPageNumber}
+        />
       </React.Fragment>
     );
 
