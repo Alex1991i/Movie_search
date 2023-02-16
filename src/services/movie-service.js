@@ -1,4 +1,4 @@
-export default class MovieService {
+class MovieService {
   _apiBase = 'https://api.themoviedb.org/3/';
 
   _apiKey = 'api_key=bd70e48556c55b9d812c859de543c2ac';
@@ -56,3 +56,7 @@ export default class MovieService {
     };
   };
 }
+
+const movieService = new MovieService();
+
+export default movieService;

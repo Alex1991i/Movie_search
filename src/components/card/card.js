@@ -5,16 +5,15 @@ import { Spin, Rate, Alert } from 'antd';
 import { Component, useContext } from 'react';
 import PropTypes from 'prop-types';
 
-import MovieService from '../../services/movie-service';
-import MovieContext from '../movie-context/movieContext';
+import MovieContext from '../movie-context/movie-context';
 import ErrorBoundry from '../error-boundry/error-boundry';
+import movieService from '../../services/movie-service';
+import localStorageService from '../../services/local-storage-service';
 
 export default class Card extends Component {
-  movieService = new MovieService();
-
   state = {
     loading: false,
-    value: localStorage.getItem(`${this.props.id}`) || 0,
+    value: localStorageService.getValue(`${this.props.id}`) || 0,
     error: false,
     errorImg: false,
   };
@@ -43,8 +42,9 @@ export default class Card extends Component {
     this.setState({
       value: rate,
     });
-    localStorage.setItem(`${id}`, rate);
-    this.movieService.setRated(id, rate, localStorage.getItem('token')).catch(this.onErorr);
+    localStorageService.setValue(`${id}`, rate);
+    movieService.setRated(id, rate, localStorageService.getValue('token')).catch(this.onErorr);
+    console.log(this.state.value);
   };
 
   render() {
@@ -55,7 +55,6 @@ export default class Card extends Component {
       <Alert message="Failed to put a rating" type="error" />
     ) : (
       <CardView
-        // eslint-disable-next-line react/jsx-props-no-spreading
         {...info}
         onLoad={this.onLoad}
         onErorrImg={this.onErorrImg}
@@ -116,9 +115,12 @@ const CardView = ({
   const path = `https://image.tmdb.org/t/p/original${poster}`;
 
   const view = !loading ? <Spin size="large" /> : null;
-  // eslint-disable-next-line no-undef
   const errorImg = error ? <img className="poster" src={require('../../img/errorImg.jpg')} alt="x" /> : null;
-  const hiden = error ? 'hiden' : '';
+  const classNames = require('classnames');
+  const imgClass = classNames({
+    poster: true,
+    hiden: error,
+  });
 
   let color = '#E90000';
   if (averageRate >= 3 && averageRate < 5) {
@@ -134,7 +136,7 @@ const CardView = ({
       <div className="card-image">
         {view}
         {errorImg}
-        <img className={`poster ${hiden}`} src={path} alt="Poster" onLoad={onLoad} onError={onErorrImg} />
+        <img className={imgClass} src={path} alt="Poster" onLoad={onLoad} onError={onErorrImg} />
       </div>
       <div className="card-body">
         <h5 className="card-title">{title}</h5>

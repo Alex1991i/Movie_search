@@ -6,20 +6,19 @@ import debounce from 'lodash.debounce';
 
 import Search from '../search/search';
 import CardList from '../card-list/card-list';
-import MovieService from '../../services/movie-service';
-import MovieContext from '../movie-context/movieContext';
+import MovieContext from '../movie-context/movie-context';
 import ErrorBoundry from '../error-boundry/error-boundry';
+import movieService from '../../services/movie-service';
+import localStorageService from '../../services/local-storage-service';
 
 export default class App extends Component {
-  movieService = new MovieService();
-
   state = {
     search: 'return',
     movies: [],
     moviesRate: [],
     pageNum: 1,
     totalPages: 0,
-    token: localStorage.getItem('token'),
+    token: localStorageService.getValue('token'),
     key: '1',
     genres: [],
     loading: true,
@@ -29,15 +28,15 @@ export default class App extends Component {
   componentDidMount() {
     const { search, pageNum, token } = this.state;
     if (!token) {
-      this.movieService
+      movieService
         .getNewSession()
         .then((res) => {
-          localStorage.setItem('token', res.guest_session_id);
+          localStorageService.setValue('token', res.guest_session_id);
         })
         .catch(this.onErorr);
     }
-    this.movieService.getMovies(search, pageNum).then(this.onMovieLoaded).catch(this.onErorr);
-    this.movieService
+    movieService.getMovies(search, pageNum).then(this.onMovieLoaded).catch(this.onErorr);
+    movieService
       .getGeneres()
       .then((res) => {
         this.setState({
@@ -50,15 +49,15 @@ export default class App extends Component {
   componentDidUpdate(prevProps, prevState) {
     const { search, pageNum, key, token } = this.state;
     if (this.state.search !== prevState.search) {
-      this.movieService.getMovies(search, pageNum).then(this.onMovieLoaded).catch(this.onErorr);
+      movieService.getMovies(search, pageNum).then(this.onMovieLoaded).catch(this.onErorr);
     } else if (this.state.pageNum !== prevState.pageNum) {
-      this.movieService.getMovies(search, pageNum).then(this.onMovieLoaded).catch(this.onErorr);
+      movieService.getMovies(search, pageNum).then(this.onMovieLoaded).catch(this.onErorr);
     }
-    if (key === '2' && this.state.key !== prevState.key) {
-      this.movieService.getRatedMovie(token, pageNum).then(this.onMovieRateLoaded).catch(this.onErorr);
+    if (key === 'rated' && this.state.key !== prevState.key) {
+      movieService.getRatedMovie(token, pageNum).then(this.onMovieRateLoaded).catch(this.onErorr);
     }
-    if (key === '1' && this.state.key !== prevState.key) {
-      this.movieService.getMovies(search, pageNum).then(this.onMovieLoaded).catch(this.onErorr);
+    if (key === 'search' && this.state.key !== prevState.key) {
+      movieService.getMovies(search, pageNum).then(this.onMovieLoaded).catch(this.onErorr);
     }
   }
 
@@ -160,12 +159,12 @@ export default class App extends Component {
 
     const items = [
       {
-        key: '1',
+        key: 'search',
         label: 'Search',
         children: tab1,
       },
       {
-        key: '2',
+        key: 'rated',
         label: 'Rated',
         children: tab2,
       },
